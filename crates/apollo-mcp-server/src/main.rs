@@ -186,9 +186,9 @@ async fn main() -> anyhow::Result<()> {
 
     let mut default_headers = HeaderMap::new();
     for header in args.headers {
-        let parts: Vec<&str> = header.split(':').map(|s| s.trim()).collect();
-        match (parts.first(), parts.get(1), parts.get(2)) {
-            (Some(key), Some(value), None) => {
+        let parts: Vec<&str> = header.splitn(2, ':').map(|s| s.trim()).collect();
+        match (parts.first(), parts.get(1)) {
+            (Some(key), Some(value)) => {
                 default_headers.append(HeaderName::from_str(key)?, HeaderValue::from_str(value)?);
             }
             _ => bail!(ServerError::Header(header)),
