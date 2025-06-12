@@ -1,0 +1,106 @@
+query SubgraphCheckWorkflowQuery($workflowId: ID!, $graphId: ID!) {
+  graph(id: $graphId) {
+    checkWorkflow(id: $workflowId) {
+      status
+      tasks {
+        __typename
+        status
+        targetURL
+        ... on CompositionCheckTask {
+          coreSchemaModified
+          result {
+            __typename
+            errors {
+              message
+              locations {
+                line
+                column
+              }
+              code
+            }
+          }
+        }
+        ... on OperationsCheckTask {
+          result {
+            __typename
+            checkSeverity
+            numberOfCheckedOperations
+            changes {
+              severity
+              code
+              description
+            }
+          }
+        }
+        ... on LintCheckTask {
+          result {
+            __typename
+            diagnostics {
+              level
+              message
+              coordinate
+              rule
+              sourceLocations {
+                start {
+                  byteOffset
+                  column
+                  line
+                }
+                end {
+                  byteOffset
+                  column
+                  line
+                }
+              }
+            }
+            stats {
+              errorsCount
+              warningsCount
+            }
+          }
+        }
+        ... on CustomCheckTask {
+          result {
+            violations {
+              coordinate
+              level
+              message
+              rule
+              sourceLocations {
+                start {
+                  byteOffset
+                  column
+                  line
+                }
+                end {
+                  byteOffset
+                  column
+                  line
+                }
+                subgraphName
+              }
+            }
+          }
+        }
+        ... on ProposalsCheckTask {
+          didOverrideProposalsCheckTask
+          proposalCoverage
+          relatedProposalResults {
+            statusAtCheck
+            proposal {
+              displayName
+            }
+          }
+          severityLevel
+        }
+        ... on DownstreamCheckTask {
+          results {
+            __typename
+            downstreamVariantName
+            failsUpstreamWorkflow
+          }
+        }
+      }
+    }
+  }
+}
