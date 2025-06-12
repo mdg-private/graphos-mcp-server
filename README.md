@@ -1,13 +1,7 @@
-<div align="center">
-<a href="https://www.apollographql.com/"><img src="https://raw.githubusercontent.com/apollographql/apollo-client-devtools/main/assets/apollo-wordmark.svg" height="100" alt="Apollo Client"></a>
-</div>
+# GraphOS MCP Server PoC
 
-# Apollo MCP Server
+Get a graph key or a user key issued on GraphOS, and start the MCP server as follows:
 
-An [MCP](https://modelcontextprotocol.io/) Server to expose GraphQL operations as MCP tools.
-
-See [the documentation](https://www.apollographql.com/docs/apollo-mcp-server/) for details.
-
-# Licensing
-
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for the full license text.
+```sh
+$ cargo run -p apollo-mcp-server -- -s graphql/graphos/api.graphql -o graphql/graphos/operations -i -e https://api.apollographql.com/api/graphql --http-address 127.0.0.1 --http-port 5000 --header "apollographql-client-name: mcp" --header "apollographql-client-version: 1.0" --header "X-API-KEY: <Your API Key>"
+```
