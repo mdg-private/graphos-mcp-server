@@ -1,0 +1,21 @@
+query GetCheckWorkflows($graphId: ID!, $filter: CheckFilterInput!) {
+  graph(id: $graphId) {
+    checkWorkflows(limit: 10, offset: 0, filter: $filter) {
+      id
+      status
+      startedAt
+      completedAt
+      implementingServiceName
+      gitContext {
+        commit
+      }
+      tasks {
+        id
+        status
+        targetURL
+        completedAt
+        createdAt
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+query GetPersistedQueriesDetails($graphId: ID!, $listId: ID!) {
+  graph(id: $graphId) {
+    persistedQueryList(id: $listId) {
+      id
+      name
+      linkedVariants {
+        name
+        id
+      }
+      currentBuild {
+        revision
+        totalOperationsInList
+        manifestChunks {
+          id
+          urls
+        }
+        publish {
+          operationCounts {
+            added
+            removed
+            updated
+            identical
+            unaffected
+          }
+        }
+      }
+    }
+  }
+}

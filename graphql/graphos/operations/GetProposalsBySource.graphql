@@ -1,0 +1,27 @@
+query GetProposalsBySource($graphId: ID!) {
+  graph(id: $graphId) {
+    proposals(filterBy: { sourceVariants: ["demo"] }) {
+      totalCount
+      proposals {
+        id
+        displayName
+        description
+        status
+        createdAt
+        updatedAt
+        sourceVariant {
+          name
+        }
+        backingVariant {
+          name
+        }
+        hasUpstreamChanges
+        isPartiallyImplemented
+        latestRevision {
+          summary
+          createdAt
+        }
+      }
+    }
+  }
+}
