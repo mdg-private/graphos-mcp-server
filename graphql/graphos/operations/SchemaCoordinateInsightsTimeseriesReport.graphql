@@ -12,9 +12,9 @@ query SchemaCoordinateInsightsTimeseriesReport(
   $orderByDirection: Ordering!,
   $filterCoordinateKind: [CoordinateKind!],
   $filterIncludeVariantNames: [String],
-  $filterIncludeSchemaCoordinates: [SchemaCoordinateInsightsTimeseriesReportCoordinateFilterInInput],
+  $filterIncludeSchemaCoordinates: [SchemaCoordinateInsightsTimeseriesReportCoordinateFilterInInput!],
   $filterExcludeVariantNames: [String],
-  $filterExcludeSchemaCoordinates: [SchemaCoordinateInsightsTimeseriesReportCoordinateFilterInInput],
+  $filterExcludeSchemaCoordinates: [SchemaCoordinateInsightsTimeseriesReportCoordinateFilterInInput!],
 ) {
   graph(id: $graphId) {
     id
@@ -30,11 +30,11 @@ query SchemaCoordinateInsightsTimeseriesReport(
          coordinateKinds: $filterCoordinateKind,
          include:  {
             variantName: $filterIncludeVariantNames,
-            coordinates: filterIncludeSchemaCoordinates
+            coordinates: $filterIncludeSchemaCoordinates
          },
          exclude:  {
             variantName: $filterExcludeVariantNames,
-            coordinates: filterExcludeSchemaCoordinates
+            coordinates: $filterExcludeSchemaCoordinates
          }
       }
     ) {
