@@ -1,0 +1,44 @@
+# This operation returns a timeseries of schema coordinate (object field, input object field, or enum value) metrics across a specified time range for this graph. It will return specified $metrics (any of `REQUEST_COUNT`, `ERROR_COUNT`, `OBSERVED_EXECUTION_COUNT`, `ESTIMATED_EXECUTION_COUNT`) grouped by the time period between $from and $to and $resolution (`HOUR`, `DAY`, or `MONTH`) and the specified $dimensions (any of `VARIANT_NAME`, `COORDINATE_KIND`, `NAMED_ATTRIBUTE`, `NAMED_TYPE`). Each time resolution has different ranges of allowed dates: For the HOUR resolution, the total time between 'from' and 'to' must be no more than 7 days, and the 'from' time must be no earlier than 90 days ago. For the DAY and MONTH resolution, the 'from' time must be no earlier than 549 days ago (approx 18 months), and the 'to' time must be no later than 1 day ago. The $filter parameter controls how many results will be returned (default 100). The results can be ordered by $orderByColumn (any metric) and $orderByDirection (`ASCENDING` or `DESCENDING`). The results can also be filtered: $filterCoordinateKind will filter out any schema coordinate kinds not in the list (`OBJECT_FIELD`, `INPUT_OBJECT_FIELD`, or `ENUM_VALUE`). $filterIncludeVariantNames will filter out any schema coordinates that were not requested from a specified variant name. $filterIncludeSchemaCoordinates can be used to only include certain schema coordiantes (the objects have three fields, `kind`, `namedType`, and `namedAttribute`, but either named type or named attribute can be omitted to only filter by named type or named attribute). The exclude version of the filters ($filterExcludeVariantNames, and $filterExcludeSchemaCoordinates) are similar but will exclude rather than include schema coordinates based on the provided lists. This API is rate limited and only allows a 3 requests per minute, so don't call it too often. It will return a RATE_LIMIT_EXCEEDED error if too many requests are made for a graph. If a request to this field times out, you should try a shorter time range or fewer dimensions.
+
+query SchemaCoordinateInsightsTimeseriesReport(
+  $graphId: ID!, 
+  $from: Timestamp!, 
+  $to: Timestamp!,
+  $resolution: TimeseriesReportResolution!,
+  $metrics: [SchemaCoordinateInsightsTimeseriesReportMetric!]!,
+  $dimensions: [SchemaCoordinateInsightsTimeseriesReportDimension!]!,
+  $limit: Int,
+  $orderByColumn: SchemaCoordinateInsightsTimeseriesReportMetric!,
+  $orderByDirection: Ordering!,
+  $filterCoordinateKind: [CoordinateKind!],
+  $filterIncludeVariantNames: [String],
+  $filterIncludeSchemaCoordinates: [SchemaCoordinateInsightsTimeseriesReportCoordinateFilterInInput],
+  $filterExcludeVariantNames: [String],
+  $filterExcludeSchemaCoordinates: [SchemaCoordinateInsightsTimeseriesReportCoordinateFilterInInput],
+) {
+  graph(id: $graphId) {
+    id
+    schemaCoordinateInsightsTimeseriesReport(
+      from: $from, 
+      to: $to, 
+      resolution: $resolution, 
+      metrics: $metrics, 
+      dimensions: $dimensions,
+      limit: $limit,
+      orderBy: { column: $orderByColumn, direction: $orderByDirection },
+      filters:  {
+         coordinateKinds: $filterCoordinateKind,
+         include:  {
+            variantName: $filterIncludeVariantNames,
+            coordinates: filterIncludeSchemaCoordinates
+         },
+         exclude:  {
+            variantName: $filterExcludeVariantNames,
+            coordinates: filterExcludeSchemaCoordinates
+         }
+      }
+    ) {
+      csv
+    }
+  }
+}

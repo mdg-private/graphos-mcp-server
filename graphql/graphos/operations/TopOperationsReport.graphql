@@ -1,0 +1,37 @@
+# This operation returns a list of operations for a specified $graphId and $graphVariant between the specified ISO timestamps ($from and $to). The from timestamp must be within the last 549 days, the to timestamp must be at least 6 hours from the current time, and the duration between 'from' and 'to' must not exceed 31 days. The number of results is defined by the $limit param. The order direction (`ASCENDING` or `DESCENDING`) is specified by the $orderByDirection param. The results can be filtered to specific clients or client versions using $filterClientNames and $filterClientVersions. 
+query TopOperationsReport(
+  $graphId: ID!, 
+  $graphVariant: String!,
+  $from: Timestamp!, 
+  $to: Timestamp!,
+  $limit: Int,
+  $orderByDirection: Ordering!,
+  $filterClientNames: [String],
+  $filterClientVersions: [String]
+) {
+  graph(id: $graphId) {
+    variant(name: $graphVariant) {
+      topOperationsReport(
+        from: $from, 
+        to: $to, 
+        filter: {
+          in: {
+            clientName: $filterClientNames,
+            clientVersion: $filterClientVersions
+          }
+        }
+        limit: $limit, 
+        orderBy: {
+          column: REQUEST_COUNT,
+          direction: $orderByDirection
+        }
+      ) {
+        operationId
+        name
+        type
+        signature
+        requestCount
+      }
+    }
+  }
+}

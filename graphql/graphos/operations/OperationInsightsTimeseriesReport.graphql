@@ -1,0 +1,59 @@
+# This operation returns a timeseries of operation metrics across a specified time range for this graph. It will return specified $metrics (any of `REQUEST_COUNT`, `REQUEST_WITH_ERROR_COUNT`, `REQUEST_LATENCY_P50_MS`, `REQUEST_LATENCY_P90_MS`, `REQUEST_LATENCY_P99_MS`) grouped by the time period between the $from and $to (ISO timestamps) and $resolution (`MINUTE`, `HOUR`, `DAY`, or `MONTH`) and the specified $dimensions (any of `GRAPH_VARIANT`, `OPERATION_ID`, `OPERATION_NAME`, `OPERATION_TYPE`, `OPERATION_SUBTYPE` (for subscriptions only), `CLIENT_NAME`, `CLIENT_VERSION`, `PERSISTED_QUERY_ID` (`null` if not requested by persisted query)). Each time resolution has different ranges of allowed dates: For the MINUTE resolution, the total time between 'from' and 'to' must be no more than 1 day, and the 'from' time must be no earlier than 30 days ago. For the HOUR resolution, the total time between 'from' and 'to' must be no more than 7 days, and the 'from' time must be no earlier than 90 days ago. For the DAY and MONTH resolution, the 'from' time must be no earlier than 549 days ago (approx 18 months), and the 'to' time must be no later than 1 day ago. The $filter parameter controls how many results will be returned (default 100). The results can be ordered by $orderByColumn (any metric) and $orderByDirection (`ASCENDING` or `DESCENDING`). The results can also be filtered: $filterOperationTypes will filter out any operation type not in the list (`QUERY`, `MUTATION`, or `SUBSCRIPTION`). $filterNamed will filter out unnamed queries if it is `false`, filter out named queries if it is `true`, or return both if it is `null`. $filterRequestedByPersistedQuery will filter out any operations that were not requested by a persisted query ID (vs. an operation body). $filterIncludeVariantNames will filter out any operations that were not requested from a specified variant name. $filterIncludeOperationIds will filter out any operations that do not have the specified operation IDs. $filterIncludeOperationNames will filter out any operations that do not have the specified operation names. $filterIncludeClients can be used to only include operations requested by certain clients (the objects have two fields, `clientName` and `clientVersion`, but either can be omitted to only filter by client name or only filter by client version). $filterIncludePersistedQueryIds will filter out any operations that were not filtered by the specified persisted query IDs. The exclude version of the filters ($filterExcludeVariantNames, $filterExcludeOperationIds, $filterExcludeOperationNames, $filterExcludeClients, $filterExcludePersistedQueryIds) are similar but will exclude rather than include operations based on the provided lists. This API is rate limited and only allows a 3 requests per minute, so don't call it too often. It will return a RATE_LIMIT_EXCEEDED error if too many requests are made for a graph. If a request to this field times out, you should try a shorter time range or fewer dimensions.
+
+query OperationInsightsTimeseriesReport(
+  $graphId: ID!, 
+  $from: Timestamp!, 
+  $to: Timestamp!,
+  $resolution: TimeseriesReportResolution!,
+  $metrics: [OperationInsightsTimeseriesReportMetric!]!,
+  $dimensions: [OperationInsightsTimeseriesReportDimension!]!,
+  $limit: Int,
+  $orderByColumn: OperationInsightsTimeseriesReportMetric!,
+  $orderByDirection: Ordering!,
+  $filterOperationTypes: [OperationType!],
+  $filterNamed: Boolean,
+  $filterRequestedByPersistedQuery: Boolean,
+  $filterIncludeVariantNames: [String],
+  $filterIncludeOperationIds: [String],
+  $filterIncludeOperationNames: [String],
+  $filterIncludeClients: [OperationInsightsTimeseriesReportClientFilterInInput],
+  $filterIncludePersistedQueryIds: [String],
+  $filterExcludeVariantNames: [String],
+  $filterExcludeOperationIds: [String],
+  $filterExcludeOperationNames: [String],
+  $filterExcludeClients: [OperationInsightsTimeseriesReportClientFilterInInput],
+  $filterExcludePersistedQueryIds: [String],
+) {
+  graph(id: $graphId) {
+    operationInsightsTimeseriesReport(
+      from: $from, 
+      to: $to, 
+      resolution: $resolution, 
+      metrics: $metrics, 
+      dimensions: $dimensions,
+      limit: $limit,
+      orderBy: { column: $orderByColumn, direction: $orderByDirection },
+      filters:  {
+         operationTypes: $filterOperationTypes,
+         named: $filterNamed,
+         requestedByPersistedQuery: $filterRequestedByPersistedQuery,
+         include:  {
+            variantName: $filterIncludeVariantNames,
+            operationId: $filterIncludeOperationIds,
+            operationName: $filterIncludeOperationNames,
+            clients: $filterIncludeClients,
+            persistedQueryId: $filterIncludePersistedQueryIds
+         },
+         exclude:  {
+            variantName: $filterExcludeVariantNames,
+            operationId: $filterExcludeOperationIds,
+            operationName: $filterExcludeOperationNames,
+            clients: $filterExcludeClients,
+            persistedQueryId: $filterExcludePersistedQueryIds
+         }
+      }
+    ) {
+      csv
+    }
+  }
+}
