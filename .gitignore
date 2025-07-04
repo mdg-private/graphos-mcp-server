@@ -21,3 +21,6 @@ target/
 
 # Symlink created by nix
 result
+
+# Env variables
+.env.*
